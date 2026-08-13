@@ -42,7 +42,7 @@ export default function VerificationEmail({
         </Row>
         <Row>
           <Text>
-            Thank you for registering on anonytalks.co.in . Please use the
+            Thank you for registering on anonytalks . Please use the
             following verification code to complete your registration:
           </Text>
         </Row>

@@ -12,7 +12,7 @@ export const sendverificationemail = async (
     const message = await resend.emails.send({
       from: "noreply@anonytalks.bharatwebcrafts.com", 
       to: email,
-      subject: "Bharat-Feedback-app | Verification Code",
+      subject: "Anonytalks | Verification Code",
       react: VerificationEmail({ username, otp: verifyCode }),
       /**So otp is the prop name expected by VerificationEmail, and verifyCode is the actual value being assigned to it */
     });
