@@ -45,7 +45,7 @@ Feedback instantly appears in the owner's dashboard
 
 ### 2. After verification, they are redirected to their dashboard.
 
-### 3. A unique link is generated (e.g., https://anonytalks.co.in/u/username).
+### 3. A unique link is generated (e.g., https://anonytalks.bharatwebcrafts.com/u/Bharatesh).
 
 ### 4. User can share this link to receive anonymous feedback.
 

@@ -1,8 +1,8 @@
 import { Toaster } from "@/components/ui/toaster";
-import "../globals.css";
+import "@/app/globals.css";
 import StoreProvider from "../(app)/StoreProvider";
 export const metadata = {
-  title: "anonytalks.co.in",
+  title: "Anonytalks",
   description: "Developed by bharatesh",
 };
 
