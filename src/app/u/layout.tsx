@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import "@/app/globals.css";
+import "../globals.css";
 import StoreProvider from "../(app)/StoreProvider";
 export const metadata = {
   title: "Anonytalks",
