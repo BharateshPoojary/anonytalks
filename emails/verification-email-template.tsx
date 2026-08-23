@@ -41,13 +41,20 @@ export default function VerificationEmail({
           <Heading as="h2">Hello {username},</Heading>
         </Row>
         <Row>
-          <Text>
-            Thank you for registering on anonytalks . Please use the
-            following verification code to complete your registration:
+          <Text
+            style={{
+              fontSize: "32px",
+              fontWeight: "bold",
+              letterSpacing: "6px",
+              textAlign: "center",
+              margin: "24px 0",
+            }}
+          >
+            {otp}
           </Text>
         </Row>
         <Row>
-          <Text>{otp}</Text>
+          <Text >{otp}</Text>
         </Row>
         <Row>
           <Text>
