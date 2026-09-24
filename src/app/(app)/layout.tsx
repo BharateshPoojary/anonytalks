@@ -18,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Anonytalks",
-  description: "designed and developed by bharatesh",
+  description: "Send Medias and text anonymously to anyone",
 };
 
 export default function RootLayout({
