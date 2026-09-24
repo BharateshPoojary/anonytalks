@@ -63,7 +63,7 @@ const Home = () => {
       <footer className="w-screen max-w-screen mx-auto p-4 md:py-2">
         <hr className="my-5 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-4" />
         <span className="block text-sm text-gray-500 text-center">
-          © 2025{" "}
+          © {new Date().getFullYear()}{" "}
           <Link
             href="http://bharatesh-portfolio.vercel.app/"
             className="hover:underline"
