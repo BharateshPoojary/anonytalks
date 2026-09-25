@@ -47,7 +47,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: ${{github.event.head_commit.message}}
+      name: production
+      url: https://anonytalks.bharatwebcrafts.com
+      
 
     steps:
       - name: Deploy over SSH
