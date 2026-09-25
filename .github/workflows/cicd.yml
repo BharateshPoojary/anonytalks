@@ -1,0 +1,103 @@
+name: CI/CD
+
+on:
+  push:
+    branches: 
+      - master
+
+# Cancel in-progress runs for the same ref to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{github.event.head_commit.message}}
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          # Forward the app secrets into the remote shell so the deploy
+          # script can regenerate the .env file on the VM.
+          envs: MONGODB_URI,RESEND_API_KEY,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,S3_ACCESS_KEY,S3_SECRET_KEY,S3_BUCKET_NAME,S3_REGION,NEXTAUTH_SECRET,NEXTAUTH_URL
+          script: |
+            set -euo pipefail
+            cd ~/feedback-app
+
+            # Pull the latest code.
+            git fetch origin master
+            git reset --hard origin/master
+
+            # Regenerate .env from the forwarded secrets.
+            cat > .env <<EOF
+            MONGODB_URI=${MONGODB_URI}
+            RESEND_API_KEY=${RESEND_API_KEY}
+            GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+            GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+            S3_ACCESS_KEY=${S3_ACCESS_KEY}
+            S3_SECRET_KEY=${S3_SECRET_KEY}
+            S3_BUCKET_NAME=${S3_BUCKET_NAME}
+            S3_REGION=${S3_REGION}
+            NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+            NEXTAUTH_URL=${NEXTAUTH_URL}
+            EOF
+            chmod 600 .env
+
+            # Install deps, build, and reload via pm2.
+            npm ci
+            npm run build
+            pm2 reload anonytalks --update-env || pm2 start npm --name anonytalks -- start
+            pm2 save
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      S3_REGION: ${{ secrets.S3_REGION }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
